@@ -12,3 +12,9 @@ comfy-table = "7.1.0"
 image = "0.24.7"
 
 [lib]
+
+[profile.release]
+strip = true
+codegen-units = 1
+lto = true
+panic = "abort"
