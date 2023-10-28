@@ -10,17 +10,17 @@ use binviz::{calculate_entropy, calculate_histogram, get_most_frequent_bytes};
 #[derive(Debug, Clone, Subcommand)]
 enum CliCommand {
     /// Calculate the entropy of a given file in bits per byte.
-    Entropy {
+    Ent {
         #[arg(short, long)]
         file: PathBuf,
     },
     /// Calculate the histogram of bytes of a given file.
-    Histogram {
+    His {
         #[arg(short, long)]
         file: PathBuf,
     },
     /// Get the top `count` most frequent bytes or all in sorted order if `None` of a given file.
-    Frequency {
+    Fre {
         #[arg(short, long)]
         file: PathBuf,
         #[arg(short, long)]
@@ -30,7 +30,7 @@ enum CliCommand {
     ///
     /// We scan pair of bytes from the file and treat that as x and y coordinates into the image.
     /// The pixels brightness will correspond with how many occurrences we have.
-    Visualize {
+    Vis {
         #[arg(short, long)]
         file: PathBuf,
     },
@@ -45,16 +45,16 @@ struct Cli {
 fn main() {
     let args = Cli::parse();
     match args.command {
-        CliCommand::Entropy { file } => {
+        CliCommand::Ent { file } => {
             let histogram = calculate_histogram(file);
             let entropy = calculate_entropy(&histogram);
             println!("{} / 8.0", entropy);
         }
-        CliCommand::Histogram { file } => {
+        CliCommand::His { file } => {
             let histogram = calculate_histogram(file);
             println!("{:?}", histogram)
         }
-        CliCommand::Frequency { file, count } => {
+        CliCommand::Fre { file, count } => {
             let histogram = calculate_histogram(file);
             let most_freq = get_most_frequent_bytes(&histogram, count);
             let total: usize = histogram.values().sum();
@@ -73,7 +73,7 @@ fn main() {
             }
             println!("{}", table);
         }
-        CliCommand::Visualize { file } => {
+        CliCommand::Vis { file } => {
             let mut two_pairs: BTreeMap<(u8, u8), usize> = BTreeMap::new();
             let mut handle = File::open(&file).expect(&format!("Couldn't open file: {:?}", file));
             let mut bytes = Vec::new();
