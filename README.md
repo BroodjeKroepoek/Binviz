@@ -14,20 +14,20 @@ cargo run -r
 
 This is the debug binary visualized:
 
-![debug_exe.png](debug_exe.png)
+![debug_exe.png](images\debug_exe.png)
 
 And this is the release binary visualized:
 
-![release_exe.png](release_exe.png)
+![release_exe.png](images\release_exe.png)
 
 ### Images (.png)
 
 This is a png screenshot of Valheim visualized:
 
-![valheim.png](valheim.png)
+![valheim.png](images\valheim.png)
 
 ## Text Data (.txt, .json, ...)
 
 This is some JSON data visualized:
 
-![json.png](json.png)
+![json.png](images\json.png)
