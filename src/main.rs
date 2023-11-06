@@ -48,7 +48,7 @@ fn main() {
         CliCommand::Ent { file } => {
             let histogram = calculate_histogram(file);
             let entropy = calculate_entropy(&histogram);
-            println!("{} / 8.0", entropy);
+            println!("{:.5} / 8.00000", entropy);
         }
         CliCommand::His { file } => {
             let histogram = calculate_histogram(file);
