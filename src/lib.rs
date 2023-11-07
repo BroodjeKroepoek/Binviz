@@ -120,13 +120,13 @@ pub fn full_analysis(files: Vec<PathBuf>) -> Result<(), Box<dyn Error>> {
         // Perform the Ent subcommand.
         let histogram = calculate_histogram(&file, 1);
         let dihistogram = calculate_histogram(&file, 2);
+
         let entropy = calculate_entropy(&histogram);
         let causal_entropy = calculate_entropy(&dihistogram);
         let entropy_output = display_entropies(entropy, causal_entropy);
         fs::write(output_folder.join("entropy.txt"), entropy_output)?;
 
         // Perform the Fre subcommand.
-        let histogram = calculate_histogram(&file, 1);
         let most_frequent_output = display_most_frequent(&histogram);
         fs::write(
             output_folder.join("most_frequent.txt"),
@@ -134,7 +134,6 @@ pub fn full_analysis(files: Vec<PathBuf>) -> Result<(), Box<dyn Error>> {
         )?;
 
         // Perform the Vis subcommand.
-        let dihistogram = calculate_histogram(&file, 2);
         let image = generate_image(&dihistogram);
         image.save(output_folder.join("image.png"))?;
 

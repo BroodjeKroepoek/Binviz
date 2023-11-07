@@ -15,7 +15,7 @@ enum CliCommand {
         file: PathBuf,
     },
     // TODO: Add the most frequent conditional byte using a di-histogram.
-    /// Get the top `count` most frequent bytes, or all if `None`, in sorted order of a given file.
+    /// Get the bytes in sorted order according to their frequency of a given file.
     Fre {
         #[arg(short, long)]
         file: PathBuf,
