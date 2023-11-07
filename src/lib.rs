@@ -23,7 +23,7 @@ where
     histogram
 }
 
-/// Calculate the dihistogram of bytes of a given file.
+/// Calculate the dihistogram of dwords of a given file.
 pub fn calculate_dihistogram<P>(file: P) -> DiHistogram
 where
     P: AsRef<Path> + Debug,
