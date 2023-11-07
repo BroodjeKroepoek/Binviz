@@ -14,11 +14,6 @@ enum CliCommand {
         #[arg(short, long)]
         file: PathBuf,
     },
-    /// Calculate the histogram of bytes of a given file.
-    His {
-        #[arg(short, long)]
-        file: PathBuf,
-    },
     /// Get the top `count` most frequent bytes or all in sorted order if `None` of a given file.
     Fre {
         #[arg(short, long)]
@@ -50,10 +45,6 @@ fn main() {
             let entropy = calculate_entropy(&histogram);
             println!("{:.5} / 8.00000", entropy);
         }
-        CliCommand::His { file } => {
-            let histogram = calculate_histogram(file);
-            println!("{:?}", histogram)
-        }
         CliCommand::Fre { file, count } => {
             let histogram = calculate_histogram(file);
             let most_freq = get_most_frequent_bytes(&histogram, count);
@@ -68,7 +59,7 @@ fn main() {
                     format!("{}", byte),
                     format!("{:#x}", byte),
                     format!("{:?}", *byte as char),
-                    format!("{}", relative_freq),
+                    format!("{:.5}", relative_freq),
                 ]);
             }
             println!("{}", table);
