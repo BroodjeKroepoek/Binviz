@@ -1,6 +1,5 @@
 use std::{
     collections::BTreeMap,
-    error::Error,
     fmt::Debug,
     fs::{self, File},
     io::Read,
@@ -107,14 +106,19 @@ pub fn generate_image(dihistogram: &Histogram<u8>) -> ImageBuffer<Luma<u16>, Vec
     image
 }
 
-pub fn full_analysis(files: Vec<PathBuf>) -> Result<(), Box<dyn Error>> {
+pub fn full_analysis(files: Vec<PathBuf>) {
     for file in &files {
         // Create a folder for each file to store the analysis results.
-        let folder_name = file.file_stem().unwrap().to_str().unwrap();
+        let folder_name = file
+            .file_stem()
+            .expect("The file has no filename")
+            .to_str()
+            .expect("The path is not valid Unicode");
         let output_folder = Path::new("output").join(folder_name);
 
         if !output_folder.exists() {
-            fs::create_dir_all(&output_folder)?;
+            fs::create_dir_all(&output_folder)
+                .expect(&format!("Couldn't `create_dir_all` on {:?}", output_folder));
         }
 
         // Perform the Ent subcommand.
@@ -124,21 +128,23 @@ pub fn full_analysis(files: Vec<PathBuf>) -> Result<(), Box<dyn Error>> {
         let entropy = calculate_entropy(&histogram);
         let causal_entropy = calculate_entropy(&dihistogram);
         let entropy_output = display_entropies(entropy, causal_entropy);
-        fs::write(output_folder.join("entropy.txt"), entropy_output)?;
+        fs::write(output_folder.join("entropy.txt"), entropy_output)
+            .expect("Couldn't write into 'entropy.txt'");
 
         // Perform the Fre subcommand.
         let most_frequent_output = display_most_frequent(&histogram);
         fs::write(
             output_folder.join("most_frequent.txt"),
             most_frequent_output,
-        )?;
+        )
+        .expect("Couldn't write into `most_frequent.txt`");
 
         // Perform the Vis subcommand.
         let image = generate_image(&dihistogram);
-        image.save(output_folder.join("image.png"))?;
+        image
+            .save(output_folder.join("image.png"))
+            .expect("Couldn't save image into `image.png`");
 
         println!("[INFO] Analysis for '{}' is complete.", file.display());
     }
-
-    Ok(())
 }

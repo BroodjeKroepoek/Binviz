@@ -33,7 +33,7 @@ enum CliCommand {
         file: PathBuf,
     },
     /// Perform a full analysis, by performing all other commands on every file
-    /// and collecting the output into a folders corresponding to each file.
+    /// and collecting the output into folders corresponding to each file.
     Full {
         #[arg(short, long)]
         files: Vec<PathBuf>,
@@ -68,10 +68,6 @@ fn main() {
             image.save("output.png").expect("Couldn't save image");
             println!("[INFO] image saved to '.\\output.png'.");
         }
-        CliCommand::Full { files } => {
-            if let Err(err) = full_analysis(files) {
-                eprintln!("Error during full analysis: {}", err);
-            }
-        }
+        CliCommand::Full { files } => full_analysis(files),
     }
 }
