@@ -8,6 +8,7 @@ use std::{
 
 use comfy_table::{presets::ASCII_MARKDOWN, Table};
 use image::{ImageBuffer, Luma};
+use log::info;
 
 type Histogram<T> = BTreeMap<Vec<T>, usize>;
 
@@ -149,11 +150,11 @@ pub fn full_analysis(files: Vec<PathBuf>) {
         image
             .save(output_folder.join("image.png"))
             .expect("Couldn't save image into `image.png`");
-        println!("[INFO] `{}` byte pairs in the visualization.", total);
-        println!(
-            "[INFO] full brightness means `{}` byte pairs at that location.",
+        info!("`{}` byte pairs in the visualization.", total);
+        info!(
+            "full brightness means `{}` byte pairs at that location.",
             avg_total
         );
-        println!("[INFO] Analysis for '{}' is complete.", file.display());
+        info!("Analysis for '{}' is complete.", file.display());
     }
 }
