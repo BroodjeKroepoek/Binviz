@@ -7,7 +7,7 @@ use std::{
 };
 
 use comfy_table::{presets::ASCII_MARKDOWN, Table};
-use image::{ImageBuffer, Luma};
+use image::{ImageBuffer, Luma, Rgb};
 use log::info;
 
 type Histogram<T> = BTreeMap<Vec<T>, usize>;
@@ -108,6 +108,33 @@ pub fn generate_image(
         if let Some(freq) = dihistogram.get(slice) {
             let brightness = (*freq as f64) / avg_total * (u16::MAX as f64);
             let pixel = Luma([brightness as u16]);
+            image.put_pixel(slice[0] as u32, slice[1] as u32, pixel);
+        }
+    }
+    (image, total, avg_total)
+}
+
+// [u8; 3] -> usize
+// slice[0] x coordinate
+// slice[1] y coordinate
+// slice[2] right now: red component
+// value right now: blue component
+// A pixel just existing adds full green component, for easier distinction vs not existent pixels.
+pub fn generate_color_image(
+    trihistogram: &Histogram<u8>,
+) -> (ImageBuffer<Rgb<u16>, Vec<u16>>, usize, f64) {
+    debug_assert!(trihistogram.into_iter().all(|x| x.0.len() == 3));
+    let mut image = ImageBuffer::new(256, 256);
+    let len = trihistogram.values().len();
+    let total: usize = trihistogram.values().sum();
+    let avg_total = (total as f64) / (len as f64);
+    for slice in trihistogram.keys() {
+        if let Some(freq) = trihistogram.get(slice) {
+            // dividing by avg_total makes it so we actually see something, by the pixel overflows if *freq* is more the the average value.
+            // by len takes it into account properly?????
+            let brightness_2 = (*freq as f64) * (u16::MAX as f64) / (avg_total as f64);
+            let brightness_1 = (slice[2] as f64) * (u16::MAX as f64) / (u8::MAX as f64);
+            let pixel = Rgb([brightness_1 as u16, 0, brightness_2 as u16]);
             image.put_pixel(slice[0] as u32, slice[1] as u32, pixel);
         }
     }

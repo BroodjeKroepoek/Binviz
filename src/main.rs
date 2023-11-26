@@ -2,12 +2,13 @@ use clap::Parser;
 use clap_derive::{Parser, Subcommand};
 use comfy_table::{presets::ASCII_MARKDOWN, Table};
 use env_logger::Env;
+
 use log::info;
 use std::{fmt::Debug, path::PathBuf, time::Instant};
 
 use binviz::{
     calculate_entropy_histogram, calculate_histogram, display_most_frequent, full_analysis,
-    generate_image,
+    generate_color_image, generate_image,
 };
 
 #[derive(Debug, Clone, Subcommand)]
@@ -34,6 +35,8 @@ enum CliCommand {
     Visualize {
         #[arg(short, long)]
         file: PathBuf,
+        #[arg(short, long)]
+        trigraph: bool,
     },
     /// Perform a full analysis, by performing all other commands on every file
     /// and collecting the output into folders corresponding to each file.
@@ -129,28 +132,49 @@ fn main() {
             );
             println!("{}", display_most_frequent(&histogram));
         }
-        CliCommand::Visualize { file } => {
+        CliCommand::Visualize { file, trigraph } => {
             info!("start: executing visualize subcommand...");
             let start_vis_command = Instant::now();
-            info!("calculating histogram...");
-            let dihistogram = calculate_histogram(&file, 2);
-            info!("finished calculating histogram.");
-            info!("generating image...");
-            let (image, total, avg_total) = generate_image(&dihistogram);
-            info!("finished generating image.");
-            info!("saving image to `.\\output.png`...");
-            image.save("output.png").expect("Couldn't save image");
-            info!("image saved to '.\\output.png'.");
-            info!("`{}` byte pairs visualized.", total);
-            info!(
-                "full brightness means `{:.4}` byte pairs at that location.",
-                avg_total
-            );
-            let elapsed_vis_command = start_vis_command.elapsed();
-            info!(
-                "end: finished executing visualize subcommand, with elapsed time: {:?}",
-                elapsed_vis_command
-            );
+            if trigraph {
+                info!("calculating histogram...");
+                let trihistogram = calculate_histogram(&file, 3);
+                info!("finished calculating histogram.");
+                info!("generating image...");
+                let (image, total, avg_total) = generate_color_image(&trihistogram);
+                info!("finished generating image.");
+                info!("saving image to `.\\output.png`...");
+                image.save("output.png").expect("Couldn't save image");
+                info!("image saved to '.\\output.png'.");
+                info!("`{}` byte pairs visualized.", total);
+                info!(
+                    "full brightness means `{:.4}` byte pairs at that location.",
+                    avg_total
+                );
+                let elapsed_vis_command = start_vis_command.elapsed();
+                info!(
+                    "end: finished executing visualize subcommand, with elapsed time: {:?}",
+                    elapsed_vis_command
+                );
+            } else {
+                let dihistogram = calculate_histogram(&file, 2);
+                info!("finished calculating histogram.");
+                info!("generating image...");
+                let (image, total, avg_total) = generate_image(&dihistogram);
+                info!("finished generating image.");
+                info!("saving image to `.\\output.png`...");
+                image.save("output.png").expect("Couldn't save image");
+                info!("image saved to '.\\output.png'.");
+                info!("`{}` byte pairs visualized.", total);
+                info!(
+                    "full brightness means `{:.4}` byte pairs at that location.",
+                    avg_total
+                );
+                let elapsed_vis_command = start_vis_command.elapsed();
+                info!(
+                    "end: finished executing visualize subcommand, with elapsed time: {:?}",
+                    elapsed_vis_command
+                );
+            };
         }
         CliCommand::Full { files } => full_analysis(files),
     }
