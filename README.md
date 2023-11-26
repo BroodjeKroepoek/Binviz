@@ -24,11 +24,13 @@ Options:
 
 This is the release binary of my other project [Spotify Stats](https://github.com/BroodjeKroepoek/Spotify-Stats) visualized, using digraph analysis:
 
-![spotify_stats_digraph.png](readme_data/spotify_stats_digraph.png)
+<img src="readme_data/spotify_stats_digraph.png" width="500">
+<!-- ![spotify_stats_digraph.png](readme_data/spotify_stats_digraph.png) -->
 
 This is the same binary visualized, but now using the new trigraph analysis, introduced in [v0.9.1](https://github.com/BroodjeKroepoek/Binviz/releases/tag/v0.9.1):
 
-![spotify_stats_trigraph.png](readme_data/spotify_stats_trigraph.png)
+<img src="readme_data/spotify_stats_trigraph.png" width="500">
+<!-- ![spotify_stats_trigraph.png](readme_data/spotify_stats_trigraph.png) -->
 
 ### Images (.png)
 
