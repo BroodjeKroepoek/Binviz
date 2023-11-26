@@ -141,6 +141,30 @@ pub fn generate_color_image(
     (image, total, avg_total)
 }
 
+pub fn generate_color_image_quartic(
+    trihistogram: &Histogram<u8>,
+) -> (ImageBuffer<Rgb<u16>, Vec<u16>>, usize, f64) {
+    debug_assert!(trihistogram.into_iter().all(|x| x.0.len() == 4));
+    let mut image = ImageBuffer::new(256, 256);
+    let len = trihistogram.values().len();
+    let total: usize = trihistogram.values().sum();
+    let avg_total = (total as f64) / (len as f64);
+    for slice in trihistogram.keys() {
+        if let Some(freq) = trihistogram.get(slice) {
+            let brightness_1 = (slice[2] as f64) * (u16::MAX as f64) / (u8::MAX as f64);
+            let brightness_2 = (slice[3] as f64) * (u16::MAX as f64) / (avg_total as f64);
+            let brightness_3 = (*freq as f64) * (u16::MAX as f64) / (avg_total as f64);
+            let pixel = Rgb([
+                brightness_1 as u16,
+                brightness_2 as u16,
+                brightness_3 as u16,
+            ]);
+            image.put_pixel(slice[0] as u32, slice[1] as u32, pixel);
+        }
+    }
+    (image, total, avg_total)
+}
+
 /// Perform a full analysis on all the files provided.
 pub fn full_analysis(files: Vec<PathBuf>) {
     for file in &files {

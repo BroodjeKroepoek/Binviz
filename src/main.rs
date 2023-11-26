@@ -8,8 +8,15 @@ use std::{fmt::Debug, path::PathBuf, time::Instant};
 
 use binviz::{
     calculate_entropy_histogram, calculate_histogram, display_most_frequent, full_analysis,
-    generate_color_image, generate_image,
+    generate_color_image, generate_color_image_quartic, generate_image,
 };
+
+#[derive(Debug, Clone, Subcommand)]
+enum Mode {
+    Di,
+    Tri,
+    Quartic,
+}
 
 #[derive(Debug, Clone, Subcommand)]
 enum CliCommand {
@@ -35,8 +42,8 @@ enum CliCommand {
     Visualize {
         #[arg(short, long)]
         file: PathBuf,
-        #[arg(short, long)]
-        trigraph: bool,
+        #[command(subcommand)]
+        mode: Mode,
     },
     /// Perform a full analysis, by performing all other commands on every file
     /// and collecting the output into folders corresponding to each file.
@@ -132,49 +139,74 @@ fn main() {
             );
             println!("{}", display_most_frequent(&histogram));
         }
-        CliCommand::Visualize { file, trigraph } => {
+        CliCommand::Visualize { file, mode } => {
             info!("start: executing visualize subcommand...");
             let start_vis_command = Instant::now();
-            if trigraph {
-                info!("calculating histogram...");
-                let trihistogram = calculate_histogram(&file, 3);
-                info!("finished calculating histogram.");
-                info!("generating image...");
-                let (image, total, avg_total) = generate_color_image(&trihistogram);
-                info!("finished generating image.");
-                info!("saving image to `.\\output.png`...");
-                image.save("output.png").expect("Couldn't save image");
-                info!("image saved to '.\\output.png'.");
-                info!("`{}` byte pairs visualized.", total);
-                info!(
-                    "full brightness means `{:.4}` byte pairs at that location.",
-                    avg_total
-                );
-                let elapsed_vis_command = start_vis_command.elapsed();
-                info!(
-                    "end: finished executing visualize subcommand, with elapsed time: {:?}",
-                    elapsed_vis_command
-                );
-            } else {
-                let dihistogram = calculate_histogram(&file, 2);
-                info!("finished calculating histogram.");
-                info!("generating image...");
-                let (image, total, avg_total) = generate_image(&dihistogram);
-                info!("finished generating image.");
-                info!("saving image to `.\\output.png`...");
-                image.save("output.png").expect("Couldn't save image");
-                info!("image saved to '.\\output.png'.");
-                info!("`{}` byte pairs visualized.", total);
-                info!(
-                    "full brightness means `{:.4}` byte pairs at that location.",
-                    avg_total
-                );
-                let elapsed_vis_command = start_vis_command.elapsed();
-                info!(
-                    "end: finished executing visualize subcommand, with elapsed time: {:?}",
-                    elapsed_vis_command
-                );
-            };
+            match mode {
+                Mode::Tri => {
+                    info!("calculating trihistogram...");
+                    let trihistogram = calculate_histogram(&file, 3);
+                    info!("finished calculating trihistogram.");
+                    info!("generating image...");
+                    let (image, total, avg_total) = generate_color_image(&trihistogram);
+                    info!("finished generating image.");
+                    info!("saving image to `.\\output.png`...");
+                    image.save("output.png").expect("Couldn't save image");
+                    info!("image saved to '.\\output.png'.");
+                    info!("`{}` byte pairs visualized.", total);
+                    info!(
+                        "full brightness means `{:.4}` byte pairs at that location.",
+                        avg_total
+                    );
+                    let elapsed_vis_command = start_vis_command.elapsed();
+                    info!(
+                        "end: finished executing visualize subcommand, with elapsed time: {:?}",
+                        elapsed_vis_command
+                    )
+                }
+                Mode::Di => {
+                    info!("calculating dihistogram...");
+                    let dihistogram = calculate_histogram(&file, 2);
+                    info!("finished calculating dihistogram.");
+                    info!("generating image...");
+                    let (image, total, avg_total) = generate_image(&dihistogram);
+                    info!("finished generating image.");
+                    info!("saving image to `.\\output.png`...");
+                    image.save("output.png").expect("Couldn't save image");
+                    info!("image saved to '.\\output.png'.");
+                    info!("`{}` byte pairs visualized.", total);
+                    info!(
+                        "full brightness means `{:.4}` byte pairs at that location.",
+                        avg_total
+                    );
+                    let elapsed_vis_command = start_vis_command.elapsed();
+                    info!(
+                        "end: finished executing visualize subcommand, with elapsed time: {:?}",
+                        elapsed_vis_command
+                    );
+                }
+                Mode::Quartic => {
+                    info!("calculating quartic-hihistogram...");
+                    let trihistogram = calculate_histogram(&file, 4);
+                    info!("finished calculating quartic-histogram.");
+                    info!("generating image...");
+                    let (image, total, avg_total) = generate_color_image_quartic(&trihistogram);
+                    info!("finished generating image.");
+                    info!("saving image to `.\\output.png`...");
+                    image.save("output.png").expect("Couldn't save image");
+                    info!("image saved to '.\\output.png'.");
+                    info!("`{}` byte pairs visualized.", total);
+                    info!(
+                        "full brightness means `{:.4}` byte pairs at that location.",
+                        avg_total
+                    );
+                    let elapsed_vis_command = start_vis_command.elapsed();
+                    info!(
+                        "end: finished executing visualize subcommand, with elapsed time: {:?}",
+                        elapsed_vis_command
+                    )
+                }
+            }
         }
         CliCommand::Full { files } => full_analysis(files),
     }
